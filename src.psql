@@ -1,0 +1,69 @@
+create or replace view dep_objects as
+select distinct coalesce(pc2.obj_type, pp.obj_type) obj_type,ns.nspname schema_name, pc.relname obj_name,coalesce(pp.proname, pc2.relname) dep_obj_name, coalesce('CREATE OR REPLACE VIEW '|| ns.nspname ||'.'||pc2.relname ||' AS '|| pg_get_viewdef(pc2.oid),pg_get_functiondef(pp.oid)) dep_definition
+from pg_depend pd 
+join pg_class pc on pc.oid = pd.refobjid or pd.refobjid = pc.reltype
+left join (select *, 'f' obj_type from pg_proc) pp on pp.oid = pd.objid
+left join pg_rewrite pr on pr.oid = pd.objid
+left join (select *, 'v' obj_type from pg_class) pc2 on pc2.oid = pr.ev_class
+join pg_namespace ns on (ns.oid = pc2.relnamespace and ns.oid = pc.relnamespace) or ns.oid = pp.pronamespace
+
+
+create or replace function dep_get_objects_recursive(schema_name_input text, obj_name_input text) 
+returns setof dep_objects
+as $$
+with recursive rec_dep_objects as (
+select do1.* 
+from dep_objects do1
+where do1.obj_name = obj_name_input and do1.schema_name = schema_name_input
+union
+select do2.*
+from dep_objects do2
+inner join rec_dep_objects dos on dos.dep_obj_name = do2.obj_name
+and do2.obj_name != do2.dep_obj_name
+)
+select * 
+from rec_dep_objects 
+$$ language sql;
+
+
+create or replace function dep_save(schema_name_input text, obj_name_input text)
+returns setof dep_objects
+as $$
+begin
+create table dep_saved(obj_type text, schema_name name, obj_name name, dep_obj_name name, dep_definition text);
+insert into dep_saved select * from dep_get_objects_recursive(schema_name_input, obj_name_input);
+return query select * from dep_saved;
+exception when others then raise exception 'Objects are already saved. Use dep_unsave() to discard them.';
+end
+$$ language plpgsql
+
+
+create or replace function dep_unsave()
+returns void
+as $$
+begin
+drop table if exists dep_saved;
+end
+$$ language plpgsql;
+
+create or replace function dep_restore(restore_source_obj bool default false)
+returns setof dep_objects
+as $$
+declare
+_row record;
+_skip record;
+begin
+for _skip in select * from dep_saved
+	loop
+		continue when not restore_source_obj and _skip.obj_name = _skip.dep_obj_name;
+		for _row in select * from dep_saved
+			loop
+				begin
+					execute _row.dep_definition;
+				exception when undefined_object or undefined_function or undefined_table then end;
+			end loop;
+		return next _skip;
+	end loop;
+-- 	drop table dep_saved; -- uncomment if you want to drop saved objects after restoring.
+end
+$$ language plpgsql;
