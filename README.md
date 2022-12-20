@@ -3,7 +3,7 @@
 These functions address the difficulty of working with dependencies in postgres. To change the schema of a view, table, function, etc. that has dependencies requires that you drop it using cascade (recursively drop all objects that use it). This desentivizes creating useful dependencies. 
 
 
-### Work Flow:
+### Workflow:
 1. Store all dependencies on an object (table, view, function) to a cache.
 2. Drop the object with cascade.
 3. Redefine the object how you please.
@@ -49,7 +49,7 @@ select dep_unsave(); -- Clear the save cache
 - Table definitions aren't stored. You can save dependencies on a table, but tables won't be restored.
 - There's no way to restore your cache, so be careful when unsaving!
 - I'm new to postgres, so there may be issues I'm unaware of. I made these because it wasn't fun building a data model having to drop things constantly. 
-- I made this for how I use postgres, I'm sure there are a lot of additions that can be made so feel free to contribute!
+- I'm sure there are a lot of additions that can be made so feel free to contribute!
 
 
 ### Star me:
