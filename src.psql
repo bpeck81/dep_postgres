@@ -6,7 +6,7 @@ left join (select *, 'f' obj_type from pg_proc) pp on pp.oid = pd.objid
 left join pg_rewrite pr on pr.oid = pd.objid
 left join (select *, 'v' obj_type from pg_class) pc2 on pc2.oid = pr.ev_class
 join pg_namespace ns on (ns.oid = pc2.relnamespace and ns.oid = pc.relnamespace) or ns.oid = pp.pronamespace
-
+;
 
 create or replace function dep_get_objects_recursive(schema_name_input text, obj_name_input text) 
 returns setof dep_objects
@@ -23,7 +23,8 @@ and do2.obj_name != do2.dep_obj_name
 )
 select * 
 from rec_dep_objects 
-$$ language sql;
+$$ language sql
+;
 
 
 create or replace function dep_save(schema_name_input text, obj_name_input text)
@@ -36,7 +37,7 @@ return query select * from dep_saved;
 exception when others then raise exception 'Objects are already saved. Use dep_unsave() to discard them.';
 end
 $$ language plpgsql
-
+;
 
 create or replace function dep_unsave()
 returns void
@@ -67,3 +68,4 @@ for _skip in select * from dep_saved
 -- 	drop table dep_saved; -- uncomment if you want to drop saved objects after restoring.
 end
 $$ language plpgsql;
+
