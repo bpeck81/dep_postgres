@@ -52,5 +52,5 @@ dep_unsave(); -- Clear the save cache
 - I made this for how I use postgres, I'm sure there are a lot of additions that can be made so feel free to contribute!
 
 
-### Payment:
+### Star me:
 - If this helped you can you give the project a star? I'd like to know if this helped other people.
