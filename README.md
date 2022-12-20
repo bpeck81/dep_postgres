@@ -43,9 +43,9 @@ dep_unsave(); -- Clear the save cache
 ```
 
 ### Limitations:
-- I no expert in postgres, so there may be issues I'm unaware of. I made these because it wasn't fun building a data model having to drop things constantly. 
+- I'm new to postgres, so there may be issues I'm unaware of. I made these because it wasn't fun building a data model having to drop things constantly. 
 - There are inefficencies in the code I wrote (a double for loop, so I didn't have to deal with restoring dependencies in the proper order).
-- It only works with tables, views, functions.
+- It only works with tables, views, and functions. I might add triggers if I end up using those.
 - Table definitions aren't stored. You can save dependencies on a table, but tables won't be restored.
 - There's no way to restore your cache so be careful when unsaving!
 - I made this for how I use postgres, I'm there are a lot of additions that can be made so feel free to add to it!
