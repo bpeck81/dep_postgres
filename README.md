@@ -31,15 +31,15 @@ Just copy the code in src.psql and execute it in your database!
 
 ### Usage:
 ```
-dep_save('public','viewa'); -- Save dependencies
+select * from dep_save('public','viewa'); -- Save dependencies
 
 drop view viewa cascade; -- Drop all of your objects
 
 create or replace viewa as select col1 from viewb; -- Modify your source object
 
-dep_restore(); -- Restore the dependencies
+select * from dep_restore(); -- Restore the dependencies
 
-dep_unsave(); -- Clear the save cache
+select dep_unsave(); -- Clear the save cache
 ```
 
 
