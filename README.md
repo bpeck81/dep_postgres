@@ -42,6 +42,7 @@ dep_restore(); -- Restore the dependencies
 dep_unsave(); -- Clear the save cache
 ```
 
+
 ### Limitations:
 - There are inefficencies in the code I wrote (a double for loop, so I didn't have to deal with restoring dependencies in the proper order).
 - It only works with tables, views, and functions. I might add triggers if I end up using those.
@@ -52,4 +53,4 @@ dep_unsave(); -- Clear the save cache
 
 
 ### Payment:
-- If I helped you can you give the project a star? I'd like to know if this helped other people. :)
+- If this helped you can you give the project a star? I'd like to know if this helped other people.
